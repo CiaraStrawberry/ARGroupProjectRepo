@@ -16,7 +16,7 @@ public class DepthMaskBoxController : MonoBehaviour {
 
     private Vector3 doorPosition;
 
-    private bool insideBoxLastFrame;
+    private bool insideBoxLastFrame = true;
 
     [SerializeField]
     private Transform startMovePoint;
@@ -31,7 +31,7 @@ public class DepthMaskBoxController : MonoBehaviour {
     {
         // TODO: Find more efficiant solution.
         // This allows the camera positioning system to be tested in editor
-        if (!Application.isEditor) Camera = GameObject.Find("First Person Camera");
+        if(!Application.isEditor) Camera = GameObject.Find("First Person Camera");
         else Camera = GameObject.Find("CameraDebugObj");
         doorPosition = Door.transform.position;
         DepthMaskToMove.position = startMovePoint.position;
@@ -45,6 +45,7 @@ public class DepthMaskBoxController : MonoBehaviour {
         Debug.Log("Mode Switched");
         List<Renderer> meshRenderersToDisable = new List<Renderer>(GetComponentsInChildren<Renderer>());
         meshRenderersToDisable.Remove(reverseDoorRenderer);
+        meshRenderersToDisable.Remove(reverseDoorRenderer.transform.parent.GetComponent<Renderer>());
         foreach(Renderer rend in meshRenderersToDisable) rend.enabled = isInside;
         if (!isInside) QuizController.instance.beginGame();
     }
@@ -57,7 +58,7 @@ public class DepthMaskBoxController : MonoBehaviour {
     private void isCameraInsideBoxDetector()
     {
         bool isInsideboxNow = false;
-        if (Camera.transform.position.x > Door.transform.position.x)   isInsideboxNow = true;
+        if (Camera.transform.position.x < Door.transform.position.x)   isInsideboxNow = true;
         else isInsideboxNow = false;
         if (isInsideboxNow != insideBoxLastFrame) DisableAllMeshRenderers(isInsideboxNow);
         insideBoxLastFrame = isInsideboxNow;

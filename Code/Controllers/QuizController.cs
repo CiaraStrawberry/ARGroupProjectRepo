@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using GoogleARCore.Examples.HelloAR;
 
 // Author : Ciaran Rowles
 // TODO: refactor fading controls into another class, would make code much nicer
@@ -45,6 +46,8 @@ public class QuizController : MonoBehaviour
     [SerializeField]
     private Transform QuizColliderParent;
 
+    private bool gameStartedOnce;
+
     // Enforce a single instance of this class. 
     // implimented as a monobehaviour component instead of making a static
     // singleton so i can interact with the scene easily.
@@ -87,6 +90,7 @@ public class QuizController : MonoBehaviour
     // Publicly called when the user touches the screen.
     public void moveToNextIntroText()
     {
+        if (UIController.canChangeIntroText == false) return;
         if (fading == false)
         {
             fading = true;
@@ -128,8 +132,10 @@ public class QuizController : MonoBehaviour
 
     public void beginGame()
     {
+        if (gameStartedOnce) return;
         fading = true;
         Debug.Log("Begin Game!");
+        gameStartedOnce = true;
         iTween.FadeTo(introText.gameObject, 1, 2f);
         StartCoroutine("callbackAfterFadeOut");
     }
@@ -178,6 +184,7 @@ public class QuizController : MonoBehaviour
     IEnumerator waitUntilCorrectIsGoneForScore(QuizDispatcher.QuizData quiz)
     {
         yield return new WaitForSeconds(2);
+        correctText.fontSize = 125;
         correctText.text = "YOU SCORED : " + quiz.origin.score + " OUT OF " + quiz.origin.allQuizes.Length;
         iTween.FadeTo(correctText.gameObject, 1, 2f);
         StartCoroutine("waitToDisableQuizScoreText");
@@ -269,7 +276,7 @@ public class QuizController : MonoBehaviour
 
     IEnumerator finalCorrectFade3SEndGame()
     {
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(10);
         Debug.Log("GAME DONE");
         Application.Quit();
     }

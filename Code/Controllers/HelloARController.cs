@@ -71,6 +71,9 @@ namespace GoogleARCore.Examples.HelloAR
         /// </summary>
         private bool m_IsQuitting = false;
 
+
+        public static GameObject SpawnedPrefab;
+
         // Custom event - by Ciaran Rowles
 
         public delegate void SpawnAction();
@@ -112,6 +115,7 @@ namespace GoogleARCore.Examples.HelloAR
 
             if (Frame.Raycast(touch.position.x, touch.position.y, raycastFilter, out hit))
             {
+                if (SpawnedPrefab != null) return;
                 // Use hit pose and camera pose to check if hittest is from the
                 // back of the plane, if it is, no need to create the anchor.
                 if ((hit.Trackable is DetectedPlane) &&
@@ -135,7 +139,11 @@ namespace GoogleARCore.Examples.HelloAR
                     // Make Andy model a child of the anchor.
                     andyObject.transform.parent = anchor.transform;
 
+                    
+
                     if (spawnedObj != null) spawnedObj();
+
+                    if(andyObject != null) SpawnedPrefab = andyObject;
                 }
             }
         }

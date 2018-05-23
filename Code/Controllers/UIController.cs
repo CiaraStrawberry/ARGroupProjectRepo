@@ -14,6 +14,8 @@ public class UIController : MonoBehaviour {
 
     private shaderGlow currentlyGlowing;
 
+    public static bool canChangeIntroText;
+
     void Start ()
     {
         cameraDepthCubeContainer.SetActive(true);
@@ -37,7 +39,7 @@ public class UIController : MonoBehaviour {
         }
         else
         {
-            if (Input.GetTouch(0).phase == TouchPhase.Began) ButtonPressed(Input.GetTouch(0).position);
+           if(Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) ButtonPressed(Input.GetTouch(0).position);
         }
 
         if (!QuizController.instance.quizStarted) return;
@@ -46,16 +48,14 @@ public class UIController : MonoBehaviour {
         Ray ray = ARCamera.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
         if (Physics.Raycast(ray, out hit)) objectHit = hit.transform;
         shaderGlow glowObj = null;
-        //if (objectHit != null)
-        //{
-        //     if (QuizController.instance.questionCurrentlyGoing && objectHit.tag != "AnswerObject") return;
-        //     if (!QuizController.instance.questionCurrentlyGoing && objectHit.tag != "QuizObject") return;
-        //}
-        if (objectHit != null)
+        // I have no idea why i removed this, might be breaking everything by not being there.
+        // TODO: check
+        if (objectHit != null) 
         {
-            glowObj = objectHit.GetComponent<shaderGlow>();
+             if (QuizController.instance.questionCurrentlyGoing && objectHit.tag == "QuizObject") return;
+             if (!QuizController.instance.questionCurrentlyGoing && objectHit.tag == "AnswerObject") return;
         }
-
+        if (objectHit != null)  glowObj = objectHit.GetComponent<shaderGlow>();
         if (currentlyGlowing != glowObj)
         {
             if (currentlyGlowing != null) currentlyGlowing.lightOff();
@@ -64,8 +64,9 @@ public class UIController : MonoBehaviour {
         currentlyGlowing = glowObj;
     }
 
-    public void ButtonPressed (Vector3 inputPos)
+    public void ButtonPressed (Vector2 inputPos)
     {
+        StartCoroutine("waitForIntroTextToStart");
         if (QuizController.instance.quizStarted)
         {
             RaycastHit hit;
@@ -92,5 +93,11 @@ public class UIController : MonoBehaviour {
 	void spawnInDoor ()
     {
         cameraDepthCubeContainer.SetActive(false);
+    }
+
+    IEnumerator waitForIntroTextToStart ()
+    {
+        yield return new WaitForSeconds(3);
+        canChangeIntroText = true;
     }
 }
