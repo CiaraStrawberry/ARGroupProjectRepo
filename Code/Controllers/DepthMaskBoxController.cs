@@ -31,11 +31,8 @@ public class DepthMaskBoxController : MonoBehaviour {
     {
         // TODO: Find more efficiant solution.
         // This allows the camera positioning system to be tested in editor
-#if !UNITY_EDITOR
-        Camera = GameObject.Find("First Person Camera");
-#else
-        Camera = GameObject.Find("CameraDebugObj");
-#endif
+        if (!Application.isEditor) Camera = GameObject.Find("First Person Camera");
+        else Camera = GameObject.Find("CameraDebugObj");
         doorPosition = Door.transform.position;
         DepthMaskToMove.position = startMovePoint.position;
         iTween.MoveTo(DepthMaskToMove.gameObject, endMovePoint.position, 10);
